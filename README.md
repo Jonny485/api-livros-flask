@@ -1,88 +1,61 @@
-# Catálogo de Livros com React (Consumo da API Flask)
+# API de Livros com Python e Flask
 
-## Objetivo da Aplicação
-Desenvolver uma interface frontend utilizando React e Vite para consultar a API de livros construída em Python com Flask (`GET /livros`) e exibir dinamicamente os três livros cadastrados na tela somente após o usuário clicar no botão **"Buscar Livros"**.
+## Objetivo da API
+Disponibilizar uma API mínima em Python com Flask que retorna um objeto JSON contendo três livros cadastrados previamente em uma lista em memória, por meio de uma rota HTTP `GET`.
 
-## Integração e Rotas Utilizadas
-- **Frontend (`frontend-livros` — React + Vite):** disponível localmente em `http://localhost:5173/`.
-- **Backend (`app.py` — Python + Flask):** disponível localmente em `http://127.0.0.1:5000/livros`, retornando uma lista JSON contendo os três registros (`id`, `titulo`, `autor` e `ano`).
-- **Proxy de Desenvolvimento (`vite.config.js`):** encaminha as chamadas feitas para `/api/livros` no React para `http://127.0.0.1:5000/livros` no servidor Flask, evitando bloqueios por política de origem (CORS).
-
-## Estrutura do Projeto
-```text
-Projeto Web/
-├── app.py                 # API Backend em Python com Flask (porta 5000)
-└── frontend-livros/       # Aplicação Frontend em React + Vite (porta 5173)
-    ├── public/
-    ├── src/
-    │   ├── App.jsx        # Componente principal, estados, fetch() e renderização
-    │   ├── App.css        # Estilização da página, cards e mensagens
-    │   └── main.jsx
-    ├── index.html
-    ├── package.json
-    └── vite.config.js     # Configuração do proxy (/api -> http://127.0.0.1:5000)
-```
+## Rota disponibilizada
+- **GET `/livros`** — disponível localmente em `[http://127.0.0.1:5000/livros](http://127.0.0.1:5000/livros)`, retornando um objeto JSON com a chave `"livros"` contendo os três registros (`id`, `titulo`, `autor` e `ano`).
 
 ## Como instalar as dependências
 
-1. **Backend (Flask):** na pasta raiz (`Projeto Web`), instale o Flask:
+1. (Opcional) Crie e ative um ambiente virtual:
    ```bash
-   pip install flask
+   python -m venv venv
    ```
+   - **Windows:**
+     ```bash
+     venv\Scripts\activate
+     ```
+   - **Linux/macOS:**
+     ```bash
+     source venv/bin/activate
+     ```
 
-2. **Frontend (React):** acesse a pasta `frontend-livros` e instale os pacotes do Node.js:
+2. Instale as dependências do projeto:
    ```bash
-   cd frontend-livros
-   npm install
+   pip install -r requirements.txt
    ```
 
 ## Como executar a aplicação
 
-Para utilizar a aplicação, é necessário manter **dois terminais em execução** ao mesmo tempo:
+Execute o servidor Flask:
+```bash
+python app.py
+```
 
-1. **Terminal 1 — Iniciar a API Flask (porta 5000):**
-   ```bash
-   python app.py
-   ```
-
-2. **Terminal 2 — Iniciar o servidor React/Vite (porta 5173):**
-   ```bash
-   cd frontend-livros
-   npm run dev
-   ```
-
-Em seguida, acesse `http://localhost:5173/` no navegador e clique no botão **Buscar Livros**.
-
-## Como realizar os testes obrigatórios
-
-1. **Estado inicial:** ao abrir `http://localhost:5173/`, confirme que apenas o título **Catálogo de Livros** e o botão **Buscar Livros** estão visíveis, sem que nenhuma requisição tenha sido feita automaticamente.
-2. **Consulta com sucesso:** com o servidor Flask ativo na porta `5000`, clique em **Buscar Livros** e verifique se os três livros (ID, título, autor e ano) são exibidos na tela.
-3. **Tratamento de erro:** interrompa o servidor Flask (`Ctrl + C` no terminal do Python), clique novamente em **Buscar Livros** e verifique se a interface apresenta uma mensagem de erro adequada em vez de falhar silenciosamente.
+Em seguida, acesse `[http://127.0.0.1:5000/livros](http://127.0.0.1:5000/livros)` no navegador para consultar os três livros em formato JSON.
 
 ---
 
 ## Respostas às questões para revisão
 
-1. **Qual é a finalidade de um componente React?**  
-   Dividir a interface do usuário em partes independentes, isoladas e reutilizáveis, onde cada parte gerencia sua própria estrutura (JSX), lógica e estado, facilitando a organização e a manutenção do código.
+1. **Qual é a finalidade de `Flask(__name__)`?**  
+   Indica ao Flask o nome do módulo ou pacote atual para que ele consiga localizar recursos relativos à aplicação (como pastas de templates ou arquivos estáticos) e identificar corretamente o ponto de entrada da aplicação.
 
-2. **Qual é a função da propriedade `onClick` em um botão?**  
-   Associar uma função manipuladora de evento ao botão para que ela seja executada no momento em que o usuário clicar nele.
+2. **Qual é a função do decorador `@app.route()`?**  
+   Associa um caminho de URL (como `"/livros"`) e os métodos HTTP permitidos (como `["GET"]`) à função Python logo abaixo, fazendo com que requisições feitas para esse endereço executem essa função.
 
-3. **Por que a requisição `fetch()` deve ser executada dentro da função associada ao clique?**  
-   Porque a consulta à API deve ocorrer apenas sob demanda — ou seja, somente quando o usuário clicar no botão **"Buscar Livros"** — e não automaticamente ao abrir ou carregar a página.
+3. **Por que a rota `/livros` utiliza o método `GET`?**  
+   Porque o objetivo é apenas consultar e ler os dados dos livros sem alterar o estado do servidor nem criar ou remover recursos, o que corresponde à semântica padrão do método HTTP `GET`.
 
-4. **Qual é a finalidade de `response.json()`?**  
-   Ler o corpo da resposta HTTP recebida do servidor e converter os dados do formato textual JSON para objetos ou arrays JavaScript que podem ser manipulados pela aplicação.
+4. **Qual é a finalidade de `jsonify()`?**  
+   Converte estruturas de dados Python (como dicionários e listas) em uma resposta HTTP válida no formato JSON, definindo automaticamente o cabeçalho `Content-Type: application/json`.
 
-5. **Por que os dados recebidos da API devem ser armazenados no estado do componente?**  
-   Porque o React monitora alterações no estado (`useState`) para saber quando precisa renderizar novamente o componente. Se os dados fossem guardados apenas em uma variável comum, a interface na tela não seria atualizada após a resposta da API.
+5. **Qual é a diferença entre uma lista Python e a representação JSON retornada pela API?**  
+   A lista Python é uma estrutura de dados em memória usada pelo interpretador durante a execução do código, enquanto a representação JSON é um formato textual estruturado (pares chave-valor, arrays e tipos primitivos) serializado para transporte na resposta HTTP e consumido por outros sistemas ou clientes.
 
-6. **Qual é a função de `map()` na apresentação dos livros?**  
-   Percorrer o array de livros armazenado no estado e transformar cada registro em um bloco de elementos JSX correspondente para ser exibido dinamicamente na página.
+6. **O que acontece quando o servidor é iniciado com `app.run(debug=True)`?**  
+   Ativa o modo de depuração: o servidor reinicia automaticamente quando detecta alterações no código e apresenta mensagens de erro detalhadas (*traceback*) no navegador caso ocorra alguma exceção.
 
-7. **Por que cada item renderizado a partir de uma lista deve possuir uma propriedade `key`?**  
-   Para que o React consiga identificar de forma única cada elemento da lista durante as atualizações do DOM, sabendo exatamente quais itens foram adicionados, modificados ou removidos sem precisar reconstruir toda a lista.
-
-8. **O que a interface deverá fazer se a API Flask estiver indisponível?**  
-   Capturar a falha na requisição e apresentar uma mensagem de erro clara ao usuário informando que não foi possível buscar os livros, em vez de falhar silenciosamente.
+7. **Qual endereço deverá ser acessado para consultar os livros localmente?**  
+   `[http://127.0.0.1:5000/livros](http://127.0.0.1:5000/livros)`
